@@ -1,40 +1,72 @@
 const reveals = document.querySelectorAll(".reveal");
+const counters = document.querySelectorAll(".counter");
+const navLinks = document.querySelectorAll(".nav a");
+const sections = document.querySelectorAll("section[id]");
+const menuToggle = document.getElementById("menuToggle");
+const nav = document.getElementById("nav");
 
-const observer = new IntersectionObserver(entries => {
+if (menuToggle) {
+
+    menuToggle.addEventListener("click", () => {
+        nav.classList.toggle("open");
+    })
+
+}
+
+navLinks.forEach(link => {
+
+    link.addEventListener("click", () => {
+        nav.classList.remove("open")
+    })
+
+})
+
+
+const revealObserver = new IntersectionObserver((entries) => {
 
     entries.forEach(entry => {
+
         if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-        }
-    });
 
-}, { threshold: 0.2 });
+            entry.target.classList.add("visible")
 
-reveals.forEach(el => observer.observe(el));
-
-const counters = document.querySelectorAll(".counter");
-
-counters.forEach(counter => {
-
-    let target = +counter.dataset.target;
-
-    let count = 0;
-
-    const update = () => {
-
-        count += Math.ceil(target / 60);
-
-        if (count >= target) {
-            counter.innerText = target;
-            return;
         }
 
-        counter.innerText = count;
+    })
 
-        requestAnimationFrame(update);
+})
 
-    };
+reveals.forEach(el => revealObserver.observe(el))
 
-    update();
 
-});
+const counterObserver = new IntersectionObserver((entries) => {
+
+    entries.forEach(entry => {
+
+        if (!entry.isIntersecting) return
+
+        const el = entry.target
+        const target = Number(el.dataset.target)
+
+        let current = 0
+
+        const interval = setInterval(() => {
+
+            current += Math.ceil(target / 40)
+
+            if (current >= target) {
+
+                current = target
+                clearInterval(interval)
+
+            }
+
+            el.textContent = current
+
+        }, 30)
+
+    })
+
+})
+
+counters.forEach(c => counterObserver.observe(c))
